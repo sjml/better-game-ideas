@@ -32,8 +32,10 @@ for title in raw_titles:
 
     # do I contain numbers at the end?
     if (title.split()[-1].isdigit()):
-        processed_titles.append(' '.join(title.split()[:-1]))
-        continue
+        # unless it's all after a colon
+        if not title.split(':')[-1].strip().isdigit():
+            processed_titles.append(' '.join(title.split()[:-1]))
+            continue
 
     # how about roman numerals?
 
