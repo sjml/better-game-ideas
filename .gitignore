@@ -1,3 +1,5 @@
+*.pyc
 env/*
 ghostdriver.log
 credentials.json
+webconfig.json

@@ -1,7 +1,6 @@
 import json
 import random
-
-import twitter
+import os
 
 def uniqify_preserve(mess):
     seen = {}
@@ -34,46 +33,43 @@ TEMPLATES = [
     "A game about $$I, in the style of $$G... that could be something special.",
 ]
 
-creds = json.load(open('credentials.json', 'r'))
-twitterApi = twitter.Api(
-                        creds['consumer-key'],
-                        creds['consumer-secret'],
-                        creds['access-token'],
-                        creds['access-token-secret']
-                        )
+def makeGamePitch(seed=None):
+    issues = []
+    for source in ISSUE_SOURCES:
+        issue_list = json.load(open(source, 'r'))
+        issues += issue_list
 
-issues = []
-for source in ISSUE_SOURCES:
-    issue_list = json.load(open(source, 'r'))
-    issues += issue_list
+    games  = []
+    for source in GAMES_SOURCES:
+        game_list = json.load(open(source, 'r'))
+        games += game_list
 
-games  = []
-for source in GAMES_SOURCES:
-    game_list = json.load(open(source, 'r'))
-    games += game_list
+    issues = uniqify_preserve(issues)
+    games = uniqify_preserve(games)
 
-issues = uniqify_preserve(issues)
-games = uniqify_preserve(games)
+    def lower_but_not_acronyms(text):
+        ret = []
+        has_acr = False
+        for word in text.split():
+            if word.isupper():
+                ret.append(word)
+            else:
+                ret.append(word.lower())
+        return " ".join(ret)
 
-def lower_but_not_acronyms(text):
-    ret = []
-    has_acr = False
-    for word in text.split():
-        if word.isupper():
-            ret.append(word)
-        else:
-            ret.append(word.lower())
-    return " ".join(ret)
+    if seed == None:
+        seed = os.urandom(16).encode('hex')
+    random.seed(seed)
+    template = random.choice(TEMPLATES)
+    game_picks = random.sample(games, template.count("$$G"))
+    issue_picks = random.sample(issues, template.count("$$I"))
+    issue_picks = map(lower_but_not_acronyms, issue_picks)
 
-random.seed()
-template = random.choice(TEMPLATES)
-game_picks = random.sample(games, template.count("$$G"))
-issue_picks = random.sample(issues, template.count("$$I"))
-issue_picks = map(lower_but_not_acronyms, issue_picks)
+    text = template
+    text = text.replace("$$G", "%s") % tuple(game_picks)
+    text = text.replace("$$I", "%s") % tuple(issue_picks)
 
-text = template
-text = text.replace("$$G", "%s") % tuple(game_picks)
-text = text.replace("$$I", "%s") % tuple(issue_picks)
+    return text, seed
 
-# print text
-twitterApi.PostUpdate(text)
+if __name__ == '__main__':
+    print makeGamePitch()
