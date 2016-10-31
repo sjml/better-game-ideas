@@ -24,12 +24,11 @@ GAMES_SOURCES = [
 TEMPLATES = [
     "What about a game like $$G but about $$I?",
     "A game in the style of $$G would be great for exploring $$I.",
-    "Why are there no $$I games like $$G?",
-    "$$G would have been more interesting if it explored $$I.",
+    "Imagine something like $$G, but it deals with $$I.",
+    "A game like $$G would potentially be a good tool to educate people on $$I.",
     "Imagine a game like $$G crossed with $$G, but it's about $$I.",
     "Someone should make a $$G-alike around themes of $$I.",
     "$$G is a fascinating game, but misses opportunities to talk about $$I.",
-    "The $$I community really should have a game like $$G",
     "A game about $$I, in the style of $$G... that could be something special.",
 ]
 
@@ -72,4 +71,5 @@ def makeGamePitch(seed=None):
     return text, seed
 
 if __name__ == '__main__':
-    print makeGamePitch()
+    for i in range(10):
+        print makeGamePitch()[0]

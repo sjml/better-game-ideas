@@ -30,6 +30,11 @@ for title in raw_titles:
         # don't care
         continue
 
+    # strip out "Episode" bits
+    col_split = title.split(":")
+    if len(col_split) > 1 and "episode" in col_split[-1].lower():
+        title = col_split[0]
+
     # do I contain numbers at the end?
     if (title.split()[-1].isdigit()):
         # unless it's all after a colon
@@ -41,8 +46,7 @@ for title in raw_titles:
 
     # is there a dash?
     if " - " in title:
-        processed_titles.append(title.split(" - ")[0])
-        continue
+        title = title.split(" - ")[0]
 
     # is there a colon?
     if ":" in title:

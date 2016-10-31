@@ -14,7 +14,7 @@ METACRITIC_CURRENT_SYSTEMS = [
     ("ps3", 2006),
     ("ps4", 2013),
     ("ios", 2007),
-    ("vita", 2011),
+    # ("vita", 2011), # gives too much weird stuff
     ("3ds", 2011),
     ("wii-u", 2012),
     ("pc", 1995),
