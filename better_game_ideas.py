@@ -12,7 +12,7 @@ def uniqify_preserve(mess):
         result.append(item)
     return result
 
-ISSUE_SOURCES = [
+ISSUES_SOURCES = [
     "data/issues-aclu.json",
     "data/issues-c4c-massaged.json",
     "data/issues-green.json",
@@ -30,11 +30,53 @@ TEMPLATES = [
     "Someone should make a $$G-alike around themes of $$I.",
     "$$G is a fascinating game, but misses opportunities to talk about $$I.",
     "A game about $$I, in the style of $$G... that could be something special.",
+    "$$G-style mechanics seem like a good match for a game about $$I.",
+    "I wish the team that made $$G would make a game about $$I.",
 ]
+
+def audit():
+    problems = []
+    longest_issue = ""
+    longest_game = ""
+    for iSource in ISSUES_SOURCES:
+        issues = json.load(open(iSource, 'r'))
+        for issue in issues:
+            if len(issue) > len(longest_issue):
+                longest_issue = issue
+    for gSource in GAMES_SOURCES:
+        games = json.load(open(gSource, 'r'))
+        for game in games:
+            if len(game) > len(longest_game):
+                longest_game = game
+    for template in TEMPLATES:
+        iCount = template.count("$$I")
+        iBase = len(template) - (len("$$I") * iCount) # yes, that's just 3, I know
+        gCount = template.count("$$G")
+        gBase = len(template) - (len("$$G") * gCount)
+        tBase = len(template) - ((len("$$G") * gCount) + (len("$$I") * iCount))
+
+        longILen = len(longest_issue)
+        longGLen = len(longest_game)
+
+        for gSource in GAMES_SOURCES:
+            games = json.load(open(gSource, 'r'))
+            for game in games:
+                if (len(game) * gCount) + tBase + (longILen * iCount) > 140:
+                    problems.append(game + " too lo when paired with longest issue in: " + template)
+        for iSource in ISSUES_SOURCES:
+            issues = json.load(open(iSource, 'r'))
+            for issue in issues:
+                if (len(issue) * iCount) + tBase + (longGLen * gCount) > 140:
+                    problems.append(issue + "too long when paired with longest game in:" + template)
+
+        # text = template.replace("$$I", longest_issue)
+        # text = text.replace("$$G", longest_game)
+        # if len(text) > 140:
+        #     print "TOO LONG: " + text
 
 def makeGamePitch(seed=None):
     issues = []
-    for source in ISSUE_SOURCES:
+    for source in ISSUES_SOURCES:
         issue_list = json.load(open(source, 'r'))
         issues += issue_list
 
@@ -71,5 +113,7 @@ def makeGamePitch(seed=None):
     return text, seed
 
 if __name__ == '__main__':
+    audit()
+    print "--"
     for i in range(10):
         print makeGamePitch()[0]

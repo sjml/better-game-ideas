@@ -2,6 +2,15 @@ import json
 
 METASCORE_CUTOFF = 90
 
+# we don't need fancy regex to recognize all of them; just the ones
+#  most likely to see in a game title
+ROMAN_NUMERALS = [
+    "I", "II", "III", "IV", "V",
+    "VI", "VII", "VIII", "IX", "X",
+    "XI", "XII", "XIII", "XIV", "XV",
+    "XVI", "XVII", "XVIII", "XIX", "XX"
+]
+
 raw_popular = json.load(open("data/games-raw-%d.json" % METASCORE_CUTOFF, "r"))
 raw_interesting = json.load(open("data/games-raw-interesting.json", "r"))
 
@@ -42,11 +51,12 @@ for title in raw_titles:
             processed_titles.append(' '.join(title.split()[:-1]))
             continue
 
-    # how about roman numerals?
-
     # is there a dash?
     if " - " in title:
         title = title.split(" - ")[0]
+
+    # remove vanity titling
+    title = title.replace("Tom Clancy's ", "")
 
     # is there a colon?
     if ":" in title:
@@ -71,8 +81,10 @@ for title in raw_titles:
             #  probably is called by the pre-colon title
             processed_titles.append(split[0])
             continue
-        elif False: # TODO: check roman numerals. <sigh>
-            pass
+        elif any(rn == split[0].split()[-1] for rn in ROMAN_NUMERALS):
+            # same for roman numerals
+            processed_titles.append(split[0])
+            continue
         else:
             # throw it out to later processing
             if split[0] not in possible_series.keys():

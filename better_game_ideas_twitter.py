@@ -1,8 +1,11 @@
 import json
+import os
 
 import twitter
 
 from better_game_ideas import makeGamePitch
+
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
 
 creds = json.load(open('credentials.json', 'r'))
 twitterApi = twitter.Api(
@@ -12,4 +15,7 @@ twitterApi = twitter.Api(
                         creds['access-token-secret']
                         )
 
-twitterApi.PostUpdate(makeGamePitch()[0])
+try:
+    twitterApi.PostUpdate(makeGamePitch()[0])
+except Exception as e:
+    pass # just silently fail if something goes wrong; this script is in no way mission critical)
